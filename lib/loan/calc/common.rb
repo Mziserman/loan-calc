@@ -145,7 +145,12 @@ module Loan
       end
 
       def term(index:)
-        raise NotImplementedError
+        {
+          index: index,
+          due_on: due_on + (index * period_duration).months,
+        }.tap do |hash|
+          yield hash
+        end
       end
 
       def reimburse_capitalized_interests(term:)

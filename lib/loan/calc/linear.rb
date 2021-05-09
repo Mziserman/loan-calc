@@ -26,14 +26,11 @@ module Loan
       end
 
       def term(index:)
-        {
-          index: index,
-          due_on: due_on + (index * period_duration).months,
-          period_capital: @period_capital,
-          period_interests: interests_calculator.period_interests(
+        super do |term|
+          term[:period_capital] = @period_capital
+          term[:period_interests] = interests_calculator.period_interests(
             amount: amount_to_capitalize(index: index)
           )
-        }.tap do |term|
           reimburse_capitalized_interests(term: term)
           last_term(term: term) if index == duration
         end

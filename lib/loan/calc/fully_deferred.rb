@@ -28,17 +28,14 @@ module Loan
       end
 
       def term(index:)
-        {
-          index: index,
-          due_on: due_on + (index * period_duration).months,
-          period_capital: @amount,
-          period_calculated_interests: interests_calculator.period_interests(
+        super do |term|
+          term[:period_capital] = @amount
+          term[:period_calculated_interests] = interests_calculator.period_interests(
             amount: amount_to_capitalize(index: index)
-          ),
-          capitalized_interests_start: @max_capitalized_interests,
-          capitalized_interests_end: bigd(0)
-        }.tap do |h|
-          h[:period_interests] = h[:period_calculated_interests] + @max_capitalized_interests
+          )
+          term[:capitalized_interests_start] = @max_capitalized_interests
+          term[:capitalized_interests_end] = bigd(0)
+          term[:period_interests] = term[:period_calculated_interests] + @max_capitalized_interests
         end
       end
     end
