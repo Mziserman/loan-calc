@@ -12,7 +12,7 @@ module Loan
 
       def create_calendar
         @calendar = (1..duration).map do |index|
-          due_on + (index - 1).months
+          due_on + ((index - 1) * period_duration).months
         end
       end
     end

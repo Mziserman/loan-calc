@@ -12,7 +12,7 @@ module Loan
 
     BIG_DECIMAL_DIGITS = 14
 
-    # autoload :Standard, 'loan/calc/standard'
+    autoload :Standard, 'loan/calc/standard'
     autoload :Common, 'loan/calc/common'
     autoload :Factory, 'loan/calc/factory'
     autoload :FullyDeferred, 'loan/calc/fully_deferred'
