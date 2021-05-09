@@ -10,7 +10,7 @@ module Loan
         due_on: Date.today,
         deferred_and_capitalized: 0,
         deferred: 0,
-        realistic_interests_duration: false,
+        interests_calculator_type: :interests,
         starting_delta: 0,
         starting_capitalized_interests: 0
       )
@@ -26,7 +26,7 @@ module Loan
           due_on: due_on,
           deferred_and_capitalized: deferred_and_capitalized,
           deferred: deferred,
-          realistic_interests_duration: realistic_interests_duration,
+          interests_calculator_type: interests_calculator_type,
           starting_delta: starting_delta,
           starting_capitalized_interests: starting_capitalized_interests
         )

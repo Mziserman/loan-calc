@@ -16,7 +16,6 @@ module Loan
                     :due_on,
                     :deferred_and_capitalized,
                     :deferred,
-                    :realistic_interests_duration,
                     :interests_calculator,
                     :starting_delta,
                     :starting_capitalized_interests
@@ -29,7 +28,7 @@ module Loan
         due_on: Date.today,
         deferred_and_capitalized: 0,
         deferred: 0,
-        realistic_interests_duration: false,
+        interests_calculator_type: :interests,
         starting_delta: 0,
         starting_capitalized_interests: 0,
         &block
@@ -50,20 +49,24 @@ module Loan
         @deferred_and_capitalized = deferred_and_capitalized
         raise 'can\'t defer more than duration - 1' if deferred + deferred_and_capitalized > duration - 1
 
-        @realistic_interests_duration = realistic_interests_duration
-
         @interests_calculator =
-          if realistic_interests_duration
+          case interests_calculator_type
+          when :interests
+            Interests.new(
+              annual_rate: @annual_rate,
+              period_duration: period_duration
+            )
+          when :simple
+            SimpleInterests.new(
+              annual_rate: @annual_rate,
+              period_duration: period_duration
+            )
+          when :realistic
             RealisticInterests.new(
               annual_rate: @annual_rate,
               period_duration: period_duration,
               due_on: due_on,
               duration: duration
-            )
-          else
-            Interests.new(
-              annual_rate: @annual_rate,
-              period_duration: period_duration
             )
           end
 
