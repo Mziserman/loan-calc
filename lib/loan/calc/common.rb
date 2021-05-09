@@ -99,6 +99,7 @@ module Loan
         end
 
         apply_deltas(timetable: timetable)
+        round(timetable: timetable)
       end
 
       def non_deferred_duration
@@ -138,7 +139,8 @@ module Loan
           due_on: due_on + (index * period_duration).months,
           period_capital: bigd(0),
           period_interests: interests_calculator.period_interests(
-            amount: @deferred_start_amount_to_capitalize
+            amount: @deferred_start_amount_to_capitalize,
+            index: index
           ),
           capitalized_interests_start: @max_capitalized_interests,
           capitalized_interests_end: @max_capitalized_interests
@@ -217,6 +219,15 @@ module Loan
             accrued_delta -= amount_to_add
           end
           term[:amount_added] = amount_to_add
+        end
+
+        timetable
+      end
+
+      def round(timetable:)
+        timetable.each do |term|
+          term[:period_interests] = term[:period_interests].round(2)
+          term[:period_capital] = term[:period_capital].round(2)
         end
 
         timetable

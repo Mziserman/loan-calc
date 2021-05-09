@@ -7,7 +7,7 @@ module Loan
         @period_rate = (1.0 + annual_rate)**(period_duration / 12.0) - 1
       end
 
-      def period_interests(amount:)
+      def period_interests(amount:, **_args)
         amount.mult(period_rate, BIG_DECIMAL_DIGITS)
       end
 

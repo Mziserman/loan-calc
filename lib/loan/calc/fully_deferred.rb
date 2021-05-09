@@ -31,7 +31,8 @@ module Loan
         super do |term|
           term[:period_capital] = @amount
           term[:period_calculated_interests] = interests_calculator.period_interests(
-            amount: amount_to_capitalize(index: index)
+            amount: amount_to_capitalize(index: index),
+            index: index
           )
           term[:capitalized_interests_start] = @max_capitalized_interests
           term[:capitalized_interests_end] = bigd(0)

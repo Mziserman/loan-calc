@@ -15,6 +15,7 @@ module Loan
     autoload :Standard, 'loan/calc/standard'
     autoload :Common, 'loan/calc/common'
     autoload :SimpleInterests, 'loan/calc/simple_interests'
+    autoload :RealisticInterests, 'loan/calc/realistic_interests'
     autoload :Factory, 'loan/calc/factory'
     autoload :FullyDeferred, 'loan/calc/fully_deferred'
     autoload :Linear, 'loan/calc/linear'

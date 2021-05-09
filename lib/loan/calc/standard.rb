@@ -25,7 +25,8 @@ module Loan
           reimbursed = bigd(0)
           (1..(index - deferred_and_capitalized - deferred)).each do |_|
             interests_part = interests_calculator.period_interests(
-              amount: @deferred_start_amount_to_capitalize - reimbursed
+              amount: @deferred_start_amount_to_capitalize - reimbursed,
+              index: index
             )
             reimbursed += bigd(@period_total - interests_part).round(2)
           end
@@ -36,7 +37,8 @@ module Loan
       def term(index:)
         super do |term|
           term[:period_interests] = interests_calculator.period_interests(
-            amount: amount_to_capitalize(index: index)
+            amount: amount_to_capitalize(index: index),
+            index: index
           )
           term[:period_capital] = @period_total - term[:period_interests]
           reimburse_capitalized_interests(term: term)

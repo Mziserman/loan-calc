@@ -29,7 +29,8 @@ module Loan
         super do |term|
           term[:period_capital] = @period_capital
           term[:period_interests] = interests_calculator.period_interests(
-            amount: amount_to_capitalize(index: index)
+            amount: amount_to_capitalize(index: index),
+            index: index
           )
           reimburse_capitalized_interests(term: term)
           last_term(term: term) if index == duration
