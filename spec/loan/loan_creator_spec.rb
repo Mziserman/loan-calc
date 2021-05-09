@@ -79,9 +79,3 @@ RSpec.describe Loan::Calc do
     end
   end
 end
-
-# CSV.open(filename, 'w') do |csv|
-#   expected.each do |row|
-#     csv << row
-#   end
-# end
