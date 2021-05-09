@@ -85,7 +85,7 @@ module Loan
       end
 
       def timetable
-        (1..duration).map do |index|
+        timetable = (1..duration).map do |index|
           if index <= deferred_and_capitalized
             deferred_and_capitalized_term(index: index)
           elsif index <= deferred_and_capitalized + deferred
@@ -94,6 +94,8 @@ module Loan
             term(index: index)
           end
         end
+
+        apply_deltas(timetable: timetable)
       end
 
       def non_deferred_duration
@@ -165,6 +167,13 @@ module Loan
         term[:period_interests] += diff
       end
 
+      def last_term(term:)
+        term[:period_capital] = (
+          @deferred_start_amount_to_capitalize -
+          capital_reimbursed(index: term[:index] - 1)
+        )
+      end
+
       def capital_reimbursed(index:)
         if index <= deferred_and_capitalized
           bigd(0)
@@ -184,6 +193,25 @@ module Loan
         else
           yield
         end
+      end
+
+      def apply_deltas(timetable:)
+        accrued_delta = starting_delta
+        timetable.each do |term|
+          rounded_interests = term[:period_interests].round(2)
+          delta = term[:period_interests] - rounded_interests
+          accrued_delta += delta
+          amount_to_add = accrued_delta.truncate(2)
+          term[:accrued_delta] = accrued_delta
+
+          if amount_to_add != bigd(0)
+            term[:period_interests] += amount_to_add
+            accrued_delta -= amount_to_add
+          end
+          term[:amount_added] = amount_to_add
+        end
+
+        timetable
       end
     end
   end

@@ -27,7 +27,7 @@ module Loan
             interests_part = interests_calculator.period_interests(
               amount: @deferred_start_amount_to_capitalize - reimbursed
             )
-            reimbursed += bigd(@period_total - interests_part)
+            reimbursed += bigd(@period_total - interests_part).round(2)
           end
           reimbursed
         end
@@ -43,6 +43,7 @@ module Loan
         }.tap do |term|
           term[:period_capital] = @period_total - term[:period_interests]
           reimburse_capitalized_interests(term: term)
+          last_term(term: term) if index == duration
         end
       end
     end

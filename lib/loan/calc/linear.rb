@@ -6,7 +6,7 @@ module Loan
           @period_capital = @deferred_start_amount_to_capitalize.div(
             non_deferred_duration,
             BIG_DECIMAL_DIGITS
-          )
+          ).round(2)
         end
       end
 
@@ -35,6 +35,7 @@ module Loan
           )
         }.tap do |term|
           reimburse_capitalized_interests(term: term)
+          last_term(term: term) if index == duration
         end
       end
     end
