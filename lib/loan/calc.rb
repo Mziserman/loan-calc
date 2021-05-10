@@ -3,6 +3,9 @@ require 'bigdecimal'
 
 require 'loan/calc/initializers/big_decimal'
 require 'loan/calc/concerns/big_decimal_concern'
+require 'loan/calc/concerns/terms_concern'
+require 'loan/calc/concerns/timetable_modifier_concern'
+require 'loan/calc/concerns/term_modifier_concern'
 require 'loan/calc/concerns/pretty_print_concern'
 require 'loan/calc/version'
 

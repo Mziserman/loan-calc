@@ -43,9 +43,6 @@ module Loan
 
       def period_interests(amount:, index:)
         amount.mult(period_rate(index: index), BIG_DECIMAL_DIGITS)
-      rescue => e
-
-        binding.pry
       end
 
       def periods_rates
@@ -55,9 +52,6 @@ module Loan
           periods_rates << calculate_period_rate(from: previous_date, to: next_date)
           previous_date = next_date
         end
-        require 'pry'
-        # binding.pry
-
         periods_rates
       end
 

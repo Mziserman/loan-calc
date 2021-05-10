@@ -8,6 +8,9 @@ module Loan
 
       include BigDecimalConcern
       include PrettyPrintConcern
+      include TermsConcern
+      include TimetableModifierConcern
+      include TermModifierConcern
 
       attr_accessor :amount,
                     :duration,
@@ -106,84 +109,6 @@ module Loan
         duration - (deferred_and_capitalized + deferred)
       end
 
-      def deferred_and_capitalized_term(index:)
-        {
-          index: index,
-          due_on: due_on + (index * period_duration).months,
-          period_capital: bigd(0),
-          period_interests: bigd(0)
-        }.tap do |term|
-          term[:capitalized_interests_start] = (
-            @starting_capitalized_interests + interests_calculator.capitalize(
-              amount: @start_amount_to_capitalize,
-              duration: index - 1
-            )
-          )
-
-          term[:capitalized_interests_end] = (
-            @starting_capitalized_interests + interests_calculator.capitalize(
-              amount: @start_amount_to_capitalize,
-              duration: index
-            )
-          )
-
-          term[:period_calculated_interests] = (
-            term[:capitalized_interests_end] - term[:capitalized_interests_start]
-          )
-        end
-      end
-
-      def deferred_term(index:)
-        {
-          index: index,
-          due_on: due_on + (index * period_duration).months,
-          period_capital: bigd(0),
-          period_interests: interests_calculator.period_interests(
-            amount: @deferred_start_amount_to_capitalize,
-            index: index
-          ),
-          capitalized_interests_start: @max_capitalized_interests,
-          capitalized_interests_end: @max_capitalized_interests
-        }.tap do |term|
-          term[:period_calculated_interests] = term[:period_interests]
-        end
-      end
-
-      def term(index:)
-        {
-          index: index,
-          due_on: due_on + (index * period_duration).months,
-        }.tap do |hash|
-          yield hash
-        end
-      end
-
-      def reimburse_capitalized_interests(term:)
-        term[:period_calculated_interests] = term[:period_interests]
-
-        term[:capitalized_interests_start] = [
-          bigd(0),
-          @max_capitalized_interests - capital_reimbursed(index: term[:index] - 1)
-        ].max
-
-        term[:capitalized_interests_end] = [
-          bigd(0),
-          @max_capitalized_interests - capital_reimbursed(index: term[:index])
-        ].max
-
-        diff = term[:capitalized_interests_start] - term[:capitalized_interests_end]
-
-        term[:period_capital] -= diff
-        term[:period_interests] += diff
-      end
-
-      def last_term(term:)
-        term[:period_capital] = (
-          @deferred_start_amount_to_capitalize -
-          capital_reimbursed(index: term[:index] - 1)
-        )
-      end
-
       def capital_reimbursed(index:)
         if index <= deferred_and_capitalized
           bigd(0)
@@ -203,34 +128,6 @@ module Loan
         else
           yield
         end
-      end
-
-      def apply_deltas(timetable:)
-        accrued_delta = starting_delta
-        timetable.each do |term|
-          rounded_interests = term[:period_interests].round(2)
-          delta = term[:period_interests] - rounded_interests
-          accrued_delta += delta
-          amount_to_add = accrued_delta.truncate(2)
-          term[:accrued_delta] = accrued_delta
-
-          if amount_to_add != bigd(0)
-            term[:period_interests] += amount_to_add
-            accrued_delta -= amount_to_add
-          end
-          term[:amount_added] = amount_to_add
-        end
-
-        timetable
-      end
-
-      def round(timetable:)
-        timetable.each do |term|
-          term[:period_interests] = term[:period_interests].round(2)
-          term[:period_capital] = term[:period_capital].round(2)
-        end
-
-        timetable
       end
     end
   end
